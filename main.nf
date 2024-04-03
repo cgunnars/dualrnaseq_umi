@@ -3674,7 +3674,10 @@ if(params.run_star) {
 	    """
 	    }
 	}
-
+	star_aligned_u_m.into {
+		star_aligned_u_m1
+		star_aligned_u_m2
+	}
 
 
 	if(params.mapping_statistics) {
@@ -3960,7 +3963,54 @@ if(params.run_star) {
 }
 
 
+/*
+ * STEP 8B - UMI_dedup
+ */
+if(params.run_umidedup){
 
+	process sam_index {
+		publishDir "${params.outdir}/STAR", mode: params.publish_dir_mode
+		storeDir "${params.outdir}/STAR"
+		tag "$sample_name"
+			label "process_high"
+
+		input:
+		set val(sample_name), file(st) from star_aligned_u_m1
+		
+		output:
+		file("${sample_name}Aligned*.bai") into samtool_index
+		
+		script:
+		"""
+		samtools index ${st}
+		""" 
+
+	}
+
+	process UMI_dedup {
+		publishDir "${params.outdir}/STAR", mode: params.publish_dir_mode
+		storeDir "${params.outdir}/STAR"
+		tag "$sample_name"
+		
+			label "process_high"
+		input:
+		set val(sample_name), file(st) from star_aligned_u_m2
+		file(index) from samtool_index.collect()
+				
+		output:
+		set val(sample_name), file("${sample_name}*.dedup.bam") into star_results_for_htseq
+
+		script:
+		name_bam = st.toString()
+		name_out = name_bam.replaceAll(/.bam/,".dedup.bam")
+		"""
+		umi_tools dedup --paired -I ${st} -S ${name_out} --buffer-whole-contig
+		"""
+	}
+} else {
+	star_aligned_u_m
+		.into {star_results_for_htseq}
+}
 /*
  * STEP 9 - HTSeq
  */
@@ -3981,7 +4031,7 @@ if(params.run_htseq_uniquely_mapped){
 
 	    input:
 	    file(gff) from quantification_gff_u_m.collect()
-	    set val(sample_name), file(st) from star_aligned_u_m
+	    set val(sample_name), file(st) from star_results_for_htseq
 	    val(host_attribute) from host_gff_attribute_htseq
 	    val(stranded) from stranded_htseq_unique
 

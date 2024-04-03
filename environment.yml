@@ -9,6 +9,7 @@ channels:
 dependencies:
   - bioconda::fastqc=0.11.9
   - bioconda::samtools=1.9
+  - bioconda::umi_tools=1.1.0
   - bioconda::salmon=1.3.0
   - bioconda::STAR=2.7.3a
   - bioconda::gffread=0.12.1
