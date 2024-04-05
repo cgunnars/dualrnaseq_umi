@@ -1,0 +1,5 @@
+Bootstrap: docker
+From: nfcore/dualrnaseq:1.0.0
+
+%post
+	conda install bioconda::umi_tools=1.0.1
