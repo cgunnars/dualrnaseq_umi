@@ -3966,7 +3966,7 @@ if(params.run_star) {
 /*
  * STEP 8B - UMI_dedup
  */
-if(params.run_umidedup){
+if(params.run_umidedup & params.run_star){
 
 	process sam_index {
 		publishDir "${params.outdir}/STAR", mode: params.publish_dir_mode
@@ -4007,9 +4007,11 @@ if(params.run_umidedup){
 		umi_tools dedup --paired -I ${st} -S ${name_out} --buffer-whole-contig
 		"""
 	}
-} else {
-	star_aligned_u_m
+} else{
+	if (params.run_star) {
+		star_aligned_u_m
 		.into {star_results_for_htseq}
+	}
 }
 /*
  * STEP 9 - HTSeq
