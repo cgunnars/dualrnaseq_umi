@@ -53,13 +53,21 @@ echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc
 source ~/.bashrc
 curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | \
     sh -s -- -b $(go env GOPATH)/bin v1.21.0
-git clone --recursive https://github.com/sylabs/singularity.git
-singularity version
+
+mkdir -p ${GOPATH}/src/github.com/sylabs && \
+cd ${GOPATH}/src/github.com/sylabs && \
+git clone https://github.com/sylabs/singularity.git && \
 cd singularity
-sudo apt-get install glib2-devel
-sudo apt-get install libgtk2.0-dev
-./mconfig
-sudo make -C builddir install
+
+git checkout v3.6.3
+
+cd ${GOPATH}/src/github.com/sylabs/singularity && \
+./mconfig && \
+cd ./builddir && \
+make && \
+sudo make install
+
+singularity version
 
 nextflow pull cgunnars/dualrnaseq_umi
 sudo singularity build .nextflow/assets/cgunnars/dualrnaseq_umi/nfcore-dualrnaseq-umi-1.0.0.img .nextflow/assets/cgunnars/dualrnaseq_umi/nfcore-dualrnaseq-umi-1.0.0.def
