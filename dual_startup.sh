@@ -8,7 +8,6 @@ echo 'installing conda'
 
 #install bcl2fastq
 conda install -c dranew bcl2fastq
-#chmod +x bcl2fastq.sh
 echo 'installing bcl2fastq'
 
 #install fastqc
@@ -17,7 +16,7 @@ echo 'installing fastqc'
 
 #install umitools
 sudo apt-get -y install gcc
-conda install bioconda::umi_tools=1.0.1
+conda create -n "umi_env" python=3.7.6 bioconda::umi_tools=1.01
 echo 'installing umi_tools'
 
 #install rsem for host alignment
@@ -69,7 +68,9 @@ sudo make install
 
 singularity version
 
-nextflow pull cgunnars/dualrnaseq_umi
+cd ~
+
+./nextflow pull cgunnars/dualrnaseq_umi
 sudo singularity build .nextflow/assets/cgunnars/dualrnaseq_umi/nfcore-dualrnaseq-umi-1.0.0.img .nextflow/assets/cgunnars/dualrnaseq_umi/nfcore-dualrnaseq-umi-1.0.0.def
 
 ./nextflow run cgunnars/dualrnaseq_umi -profile test,singularity
