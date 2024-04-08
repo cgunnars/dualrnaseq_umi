@@ -1,3 +1,10 @@
+# The following changes were made by Cal Gunnarsson to incorporate UMI-based deduplication for fragmentation-first libraries:
+- Added UMI deduplication using umi_tools v1.0.1 as an optional flag --run_umidedup. Assumes that reads contain UMIs in the fastq header, that fragmentation happens before addition, and requires STAR to be run. 
+- Creates a singularity image bootstrapped from the nf-core image, where umi_tools is installed. Specified as a local file for the process container.
+
+TO RUN: create a clean instance (25 GB bootdisk). After creating / downloading the file dual_startup.sh, chmod +x dual_startup.sh to make it an executable, then run using source dual_startup.sh. **Using source is required for nested installations to proceed, as the startup script will be changing environment variables.** 
+
+
 # ![nf-core/dualrnaseq](docs/images/nf-core-dualrnaseq_logo.png)
 
 [![GitHub Actions CI Status](https://github.com/nf-core/dualrnaseq/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/dualrnaseq/actions)
