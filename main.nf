@@ -4009,7 +4009,7 @@ if(params.run_umidedup & params.run_star){
 	}
 } else{
 	if (params.run_star) {
-		star_aligned_u_m
+		star_aligned_u_m1
 		.into {star_results_for_htseq}
 	}
 }
