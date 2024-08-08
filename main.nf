@@ -3998,7 +3998,7 @@ if(params.run_umidedup & params.run_star){
 		file(index) from samtool_index.collect()
 				
 		output:
-		set val(sample_name), file("${sample_name}*.dedup.bam") into star_results_for_htseq
+		set val(sample_name), file("${sample_name}Aligned*.dedup.bam") into star_results_for_htseq
 
 		script:
 		name_bam = st.toString()
