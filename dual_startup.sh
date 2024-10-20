@@ -16,7 +16,7 @@ echo 'installing fastqc'
 
 #install umitools
 sudo apt-get -y install gcc
-conda create -n "umi_env" python=3.7.6 bioconda::umi_tools=1.01
+conda create -n "umi_env" python=3.7.6 bioconda::umi_tools=1.0.1
 echo 'installing umi_tools'
 
 #install rsem for host alignment
