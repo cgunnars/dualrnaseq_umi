@@ -5,9 +5,12 @@
 Installation: create a clean instance (25 GB bootdisk). After creating / downloading the file dual_startup.sh, chmod +x dual_startup.sh to make it an executable, then run using source dual_startup.sh. **Using source is required for nested installations to proceed, as the startup script will be changing environment variables.** 
 
 Running: 
+
 First, extract UMIs from header using appropriate flags for library structure. (Current script assumes paired end, fragmentation-first libraries with a composite 10 bp (5 + 5) UMI in the first 5 bases of reads 1 and 2.)
+
 $ ./umi-extract.sh 
 
+Next, provide UMI-extracted .fastqs to the pipeline
 $ ./nextflow run cgunnars/dualseq_umi -profile singularity --run_umidedup --run_star \[other params\]
 
 (Additional arguments, such as the input path for your data and the genomes of interest, are provided either in the config file or at run time.)
