@@ -3,8 +3,8 @@ process TXIMPORT {
     label 'process_single'
 
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'nfcore/dualrnaseq:dev'
-        : 'nfcore/dualrnaseq:dev'}"
+        ? 'docker.io/nfcore/dualrnaseq:dev'
+        : 'docker.io/nfcore/dualrnaseq:dev'}"
 
     input:
     tuple val(meta), file(host_quant)

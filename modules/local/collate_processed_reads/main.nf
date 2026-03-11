@@ -1,7 +1,7 @@
 process COLLATE_PROCESSED_READS {
     label 'process_high'
     conda "python=3.8.3"
-    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ? 'nfcore/dualrnaseq:dev' : 'nfcore/dualrnaseq:dev'}"
+    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ? 'docker.io/nfcore/dualrnaseq:dev' : 'docker.io/nfcore/dualrnaseq:dev'}"
 
     // Set publishDir to the process using inputs.process
     publishDir path: "${params.outdir}/mapping_statistics/${process}/", mode: params.publish_dir_mode

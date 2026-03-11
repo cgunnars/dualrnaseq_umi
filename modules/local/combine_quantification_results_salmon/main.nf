@@ -1,8 +1,8 @@
 process COMBINE_QUANTIFICATION_RESULTS_SALMON {
     label 'process_high'
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'nfcore/dualrnaseq:dev'
-        : 'nfcore/dualrnaseq:dev'}"
+        ? 'docker.io/nfcore/dualrnaseq:dev'
+        : 'docker.io/nfcore/dualrnaseq:dev'}"
 
     input:
     path input_quantification
