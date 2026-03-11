@@ -51,12 +51,12 @@
                     },
                     "salmon/index": {
                         "branch": "master",
-                        "git_sha": "5d2c0dd6a8e2790e7ff511f7f4d761f4ed627a91",
+                        "git_sha": "196cde9b19d49324c5cf10977959f5db856ebbdd",
                         "installed_by": ["modules"]
                     },
                     "salmon/quant": {
                         "branch": "master",
-                        "git_sha": "5d2c0dd6a8e2790e7ff511f7f4d761f4ed627a91",
+                        "git_sha": "196cde9b19d49324c5cf10977959f5db856ebbdd",
                         "installed_by": ["modules"]
                     },
                     "star/align": {

@@ -27,7 +27,6 @@ workflow SALMON_SELECTIVE_ALIGNMENT {
         ch_host_pathogen_fasta_genome,
         ch_host_pathogen_fasta_transcripts,
     ).index
-    ch_versions = ch_versions.mix(SALMON_INDEX.out.versions)
 
     // Set to false, as were using selective alignment (not with Star and alignment directly)
     def alignment_mode = false
@@ -44,14 +43,12 @@ workflow SALMON_SELECTIVE_ALIGNMENT {
         alignment_mode,
         params.libtype,
     )
-    ch_versions = ch_versions.mix(SALMON_QUANT.out.versions)
-
 
     // -------
     // Split the quant table into host and pathogen reads
     // -------
     SALMON_SPLIT_TABLE_EACH(
-        SALMON_QUANT.out.quant,
+        SALMON_QUANT.out.results,
         ch_pathogen_fasta_transcripts,
         ch_host_fasta_transcripts,
     )
@@ -100,7 +97,7 @@ workflow SALMON_SELECTIVE_ALIGNMENT {
         // Is saved under: mapping_statistics/salmon_SA
         // Separate files for each sample
         EXTRACT_PROCESSED_READS(
-            SALMON_QUANT.out.json_results,
+            SALMON_QUANT.out.json_info,
             "Salmon_SA",
         )
 
