@@ -13,6 +13,7 @@ include { PREPARE_REFERENCE_FILES         } from '../subworkflows/local/prepare_
 include { SALMON_SELECTIVE_ALIGNMENT      } from '../subworkflows/local/salmon_selective_alignment'
 include { SALMON_ALIGNMENT_BASED          } from '../subworkflows/local/salmon_alignment_based'
 include { STAR_HTSEQ as STAR_ALIGNMENT    } from '../subworkflows/local/star_htseq'
+include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,7 +28,6 @@ include { FASTQC                          } from '../modules/nf-core/fastqc'
 include { FASTQC as FASTQC_AFTER_TRIMMING } from '../modules/nf-core/fastqc'
 include { CUTADAPT                        } from '../modules/nf-core/cutadapt'
 include { MULTIQC                         } from '../modules/nf-core/multiqc'
-include { CUSTOM_DUMPSOFTWAREVERSIONS     } from '../modules/nf-core/custom/dumpsoftwareversions'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,6 +44,24 @@ workflow DUALRNASEQ {
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
+    // Collect versions from topic channels
+    def topic_versions = channel.topic("versions")
+      .distinct()
+      .branch { entry ->
+          versions_file: entry instanceof Path
+          versions_tuple: true
+      }
+    def topic_versions_string = topic_versions.versions_tuple
+      .map { process, tool, version ->
+          [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
+      }
+      .groupTuple(by:0)
+      .map { process, tool_versions ->
+          tool_versions.unique().sort()
+          "${process}:\n${tool_versions.join('\n')}"
+      }
+
+
     // Initialize required channels
     //ch_workflow_summary = Channel.empty()
     //ch_methods_description = Channel.empty()
@@ -57,19 +75,16 @@ workflow DUALRNASEQ {
 
     if (params.fastqc) {
         FASTQC(ch_samplesheet)
-        ch_versions = ch_versions.mix(FASTQC.out.versions.first())
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect { it[1] })
     }
 
     if (params.cutadapt) {
         CUTADAPT(ch_samplesheet)
         ch_reads = CUTADAPT.out.reads
-        ch_versions = ch_versions.mix(CUTADAPT.out.versions.first())
     }
 
     if (params.fastqc && params.cutadapt) {
         FASTQC_AFTER_TRIMMING(ch_reads)
-        ch_versions = ch_versions.mix(FASTQC_AFTER_TRIMMING.out.versions.first())
     }
 
 
@@ -120,10 +135,11 @@ workflow DUALRNASEQ {
         )
     }
 
-    //Capture software versions
-    CUSTOM_DUMPSOFTWAREVERSIONS(
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
+    
+
+    ch_collated_versions = softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
+        .mix(topic_versions_string)
+        .collectFile(storeDir: "${params.outdir}/pipeline_info", name: 'nf_core_dualrnaseq_versions.yml', sort: true, newLine: true)
 
     MULTIQC(
         ch_multiqc_files.collect(),
