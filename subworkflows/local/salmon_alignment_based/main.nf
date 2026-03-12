@@ -26,11 +26,12 @@ workflow SALMON_ALIGNMENT_BASED {
     // -------
     // Run create STAR index
     // -------
+    ch_host_pathogen_fasta_genome = ch_host_pathogen_fasta_genome.map { item -> tuple('composite_fasta', item) }.view()
+    ch_host_pathogen_gff_star = ch_host_pathogen_gff.map { item -> ['composite_gff', item] }.view()
     STAR_GENOMEGENERATE(
         ch_host_pathogen_fasta_genome,
-        ch_host_pathogen_gff,
+        ch_host_pathogen_gff_star,
     )
-    ch_versions = ch_versions.mix(STAR_GENOMEGENERATE.out.versions)
 
 
     // -------
@@ -38,13 +39,12 @@ workflow SALMON_ALIGNMENT_BASED {
     // -------
     STAR_ALIGN(
         ch_reads,
-        STAR_GENOMEGENERATE.out.index,
+        STAR_GENOMEGENERATE.out.index.map { item -> item[1]},
         ch_host_pathogen_gff,
         true,
         '',
         '',
     )
-    ch_versions = ch_versions.mix(STAR_ALIGN.out.versions)
 
 
     // Set to true, as were using alignment-based (with STAR), not selective alignment and Salmon directly
@@ -63,14 +63,15 @@ workflow SALMON_ALIGNMENT_BASED {
         alignment_mode,
         params.libtype,
     )
-    ch_versions = ch_versions.mix(SALMON_QUANT.out.versions)
 
 
     // -------
     // Split the quant table into host and pathogen reads
     // -------
+    salmon_sf = SALMON_QUANT.out.results.map { meta, results -> 
+                                               tuple(meta, results+'/quant.sf')}
     SALMON_SPLIT_TABLE_EACH(
-        SALMON_QUANT.out.quant,
+        salmon_sf,
         ch_pathogen_fasta_transcripts,
         ch_host_fasta_transcripts,
     )
@@ -114,7 +115,7 @@ workflow SALMON_ALIGNMENT_BASED {
     // -------
     if (params.mapping_stats) {
         EXTRACT_PROCESSED_READS(
-            SALMON_QUANT.out.json_results,
+            SALMON_QUANT.out.json_info,
             "Salmon_AB",
         )
 

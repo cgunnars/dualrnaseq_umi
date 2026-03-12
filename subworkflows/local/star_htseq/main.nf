@@ -15,11 +15,12 @@ workflow STAR_HTSEQ {
     // -------
     // Run create STAR index
     // -------
+    ch_host_pathogen_fasta_genome = ch_host_pathogen_fasta_genome.map { item -> tuple('composite_fasta', item) }.view()
+    ch_host_pathogen_gff_star = ch_host_pathogen_gff.map { item -> ['composite_gff', item] }.view()
     STAR_GENOMEGENERATE(
         ch_host_pathogen_fasta_genome,
-        ch_host_pathogen_gff,
+        ch_host_pathogen_gff_star,
     )
-    ch_versions = ch_versions.mix(STAR_GENOMEGENERATE.out.versions)
 
 
     // -------
@@ -27,13 +28,13 @@ workflow STAR_HTSEQ {
     // -------
     STAR_ALIGN(
         ch_reads,
-        STAR_GENOMEGENERATE.out.index,
+        STAR_GENOMEGENERATE.out.index.map { item -> item[1]},
         ch_host_pathogen_gff,
         true,
         '',
         '',
     )
-    ch_versions = ch_versions.mix(STAR_ALIGN.out.versions)
+    
 
 
     // -------
@@ -44,7 +45,6 @@ workflow STAR_HTSEQ {
             STAR_ALIGN.out.bam_sorted,
             ch_host_pathogen_gff,
         )
-        ch_versions = ch_versions.mix(HTSEQ_COUNT.out.versions.first())
     }
 
     // -------
