@@ -47,8 +47,10 @@ workflow SALMON_SELECTIVE_ALIGNMENT {
     // -------
     // Split the quant table into host and pathogen reads
     // -------
+    salmon_sf = SALMON_QUANT.out.results.map { meta, results -> 
+                                               tuple(meta, results+'/quant.sf')}
     SALMON_SPLIT_TABLE_EACH(
-        SALMON_QUANT.out.results,
+        salmon_sf,
         ch_pathogen_fasta_transcripts,
         ch_host_fasta_transcripts,
     )
