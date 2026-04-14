@@ -8,9 +8,6 @@ process EXTRACT_PROCESSED_READS {
         ? 'nfcore/dualrnaseq:dev'
         : 'nfcore/dualrnaseq:dev'}"
 
-    // Set publishDir to the process using inputs.process
-    publishDir path: "${params.outdir}/mapping_statistics/${process}/", mode: params.publish_dir_mode
-
     input:
     tuple val(meta), file(json_file)
     val process
