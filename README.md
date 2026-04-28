@@ -1,4 +1,4 @@
-# The following changes were made by Cal Gunnarsson to incorporate UMI-based deduplication for fragmentation-first libraries:
+### Modifications: Incorporating UMI-based deduplication for fragmentation-first libraries -- instructions for DSL1
 - Added UMI deduplication using umi_tools v1.0.1 as an optional flag --run_umidedup. Assumes that reads contain UMIs in the fastq header, that fragmentation happens before addition, and requires STAR to be run. 
 - Creates a singularity image bootstrapped from the nf-core image, where umi_tools is installed. Specified as a local file for the process container.
 
@@ -14,6 +14,9 @@ Next, provide UMI-extracted .fastqs to the pipeline
 $ ./nextflow run cgunnars/dualseq_umi -profile singularity --run_umidedup --run_star \[other params\]
 
 (Additional arguments, such as the input path for your data and the genomes of interest, are provided either in the config file or at run time.)
+
+### WIP: Porting to DSL2
+Currently, dualrnaseq is in DSL1 and is partially ported to DSL2. You can see some work on dev branches related to 1) fixing linting/passing CI tests and 2) updating modules. 
 
 # ![nf-core/dualrnaseq](docs/images/nf-core-dualrnaseq_logo.png)
 
